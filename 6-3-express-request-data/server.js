@@ -109,10 +109,23 @@ const app = express();
 
 
 // create server
-app.listen(3000, () => console.log("API running at http://localhost:3000"));
 app.use(express.json());
-console.log()
+app.listen(3000, () => console.log("API running at http://localhost:3000"));
+app.get("/echo", (req, res) => {
+   const { name, age } = req.query;
+   if (!name || !age) {
+      return res.status(400).json({ ok: false, error: "name & age required" });
+   }
+   res.json({ ok: true, name, age, msg: `Hello ${name}, you are ${age}` });
+});
 
+app.get("/profile/:first/:last", (req, res) => {
+    const { first, last } = req.params;
+    res.json({
+        ok: true,
+        fullName: `${first} ${last}`
+    });
+});
 
 // Query params: /echo?name=Ali&age=22
 
