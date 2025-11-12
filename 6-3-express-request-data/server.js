@@ -126,17 +126,48 @@ app.get("/profile/:first/:last", (req, res) => {
         fullName: `${first} ${last}`
     });
 });
+app.param("userId", (req, res, next, userId) => {
+    // 1. Convert userId to a number
+    const userIdAsNumber = Number(userId);
 
-// Query params: /echo?name=Ali&age=22
+    // 2. Check if it's a positive number
+    // Checks for NaN (if conversion failed) or non-positive values
+    if (isNaN(userIdAsNumber) || userIdAsNumber <= 0) {
+        return res.status(400).json({ 
+            ok: false, 
+            error: "userId must be a positive number" 
+        });
+    }
+
+    // 3. Store numeric value and call next()
+    req.userIdNum = userIdAsNumber;
+    next();
+});
+// ----------------------------------------------
 
 
-// Route params: /profile/First/Last
+// Existing routes:
+app.get("/echo", (req, res) => {
+    const { name, age } = req.query;
+    if (!name || !age) {
+        return res.status(400).json({ ok: false, error: "name & age required" });
+    }
+    res.json({ ok: true, name, age, msg: `Hello ${name}, you are ${age}` });
+});
 
+app.get("/profile/:first/:last", (req, res) => {
+    const { first, last } = req.params;
+    res.json({
+        ok: true,
+        fullName: `${first} ${last}`
+    });
+});
 
-// Route param middleware example: /users/42
-
-
-// Route params: /users/:userId route
-
-
-
+app.get("/users/:userId", (req, res) => {
+    res.json({ 
+        ok: true, 
+        userId: req.userIdNum,
+        message: `Validated user ID ${req.userIdNum} successfully!` 
+    });
+});
+app.listen(3000, () => console.log("API running at http://localhost:3000"));
