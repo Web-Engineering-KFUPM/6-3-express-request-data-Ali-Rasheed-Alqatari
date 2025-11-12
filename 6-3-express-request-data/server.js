@@ -109,6 +109,9 @@ const app = express();
 
 
 // create server
+app.listen(3000, () => console.log("API running at http://localhost:3000"));
+app.use(express.json());
+console.log()
 
 
 // Query params: /echo?name=Ali&age=22
